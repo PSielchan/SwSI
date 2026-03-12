@@ -168,10 +168,12 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(stats):
     # Rozwiązanie zadania 2
     # Uzupełnij kod poniżej
-    ...
+    data = [1.4, 1.8, 1.4, 1.4, 1.5]
+    res = stats.gamma.fit(data)
+    print(res)
     return
 
 
@@ -192,14 +194,14 @@ def _(DATA_DIR, pd):
     goals_df = pd.read_csv(DATA_DIR / "goals.csv")
     print(goals_df.describe())
     goals_df
-    return
+    return (goals_df,)
 
 
 @app.cell
-def _():
+def _(goals_df, np):
     # Estymacja MLE dla rozkładu Poissona
     # Uzupełnij kod poniżej
-    ...
+    np.mean(goals_df)
     return
 
 
@@ -218,14 +220,14 @@ def _(mo):
 def _(DATA_DIR, pd):
     kicks_df = pd.read_csv(DATA_DIR / "kicks.csv")
     kicks_df
-    return
+    return (kicks_df,)
 
 
 @app.cell
-def _():
+def _(kicks_df, np, stats):
     # Estymacja MLE dla rozkładów Poissona
     # Uzupełnij kod poniżej
-    ...
+    np.mean(stats.poisson.mean(kicks_df))
     return
 
 
@@ -249,14 +251,21 @@ def _():
     trees = get_rdataset("trees").data
     print(trees.describe())
     trees
-    return
+    return (trees,)
 
 
 @app.cell
-def _():
+def _(np, stats, trees):
     # Przedziały ufności dla średniej wysokości
     # Uzupełnij kod poniżej
-    ...
+    data2 = trees.get("Height")
+    confidence = 0.95
+    n = len(data2)
+    mean = np.mean(data2)
+    sem = stats.sem(data2)
+    interval = stats.t.interval(confidence, df=n-1, loc=mean, scale=sem)
+    interval2 = stats.t.interval(0.99, df=n-1, loc=mean, scale=sem)
+    print(interval,interval2)
     return
 
 
