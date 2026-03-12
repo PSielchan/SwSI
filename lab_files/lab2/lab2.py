@@ -88,15 +88,15 @@ def _(np):
 
     def initialize_theta(size):
         # TODO: zwróć wektor wartości początkowych o rozmiarze `size`
-        ...
+        return np.zeros(size)
 
     def loss_function(theta, x, y):
         # TODO: oblicz i zwróć wartość funkcji kosztu J(theta)
-        ...
+        return np.sum((np.dot(x, theta) - y)**2)/2
 
     def loss_gradient(theta, x, y):
         # TODO: oblicz i zwróć gradient J względem theta
-        ...
+        return np.dot(np.transpose(x),(np.dot(x,theta)-y))
 
     def batch_least_mean_squares(learning_rate, x, y):
         intercept = np.ones(y.size)
@@ -106,7 +106,7 @@ def _(np):
 
         while iteration < MAX_ITERATION:
             # TODO: zaktualizuj theta
-            ...
+            theta -= learning_rate*np.dot(np.transpose(x_with_intercept),(np.dot(x_with_intercept,theta)-y))
             iteration += 1
 
         return theta, loss_function(theta, x_with_intercept, y)
@@ -120,7 +120,7 @@ def _(np):
         while iteration < MAX_ITERATION:
             for i in range(y.size):
                 # TODO: zaktualizuj theta
-                ...
+                theta -= np.dot(learning_rate*(np.dot(np.transpose(theta),x_with_intercept[i])-y[i]),x_with_intercept[i])
             iteration += 1
 
         return theta, loss_function(theta, x_with_intercept, y)
@@ -129,6 +129,7 @@ def _(np):
         LEARNING_RATE,
         batch_least_mean_squares,
         incremental_least_mean_squares,
+        loss_function,
     )
 
 
@@ -185,7 +186,7 @@ def _(
 
     print(f"Batch LMS:       theta={theta_batch_2d_1}, J={loss_batch_2d_1:.4f}")
     print(f"Incremental LMS: theta={theta_inc_2d_1}, J={loss_inc_2d_1:.4f}")
-    return
+    return x_2d_1, y_2d_1
 
 
 @app.cell
@@ -203,12 +204,44 @@ def _(
 
     print(f"Batch LMS:       theta={theta_batch_2d_2}, J={loss_batch_2d_2:.4f}")
     print(f"Incremental LMS: theta={theta_inc_2d_2}, J={loss_inc_2d_2:.4f}")
-    return
+    return (y_2d_2,)
 
 
 @app.cell
-def _():
-    # Tutaj umieść kod wizualizacji
+def _(loss_function, np, x_2d_1, x_2d_2d, y_2d_1, y_2d_2):
+    import matplotlib.pyplot as plt
+
+    def visualize_cost_surface(x, y):
+
+        intercept = np.ones(y.size)
+        X = np.column_stack((intercept, x))
+
+        theta0_vals = np.linspace(-10, 10, 100)
+        theta1_vals = np.linspace(-10, 10, 100)
+
+        J = np.zeros((len(theta0_vals), len(theta1_vals)))
+
+        for i in range(len(theta0_vals)):
+            for j in range(len(theta1_vals)):
+
+                theta = np.array([theta0_vals[i], theta1_vals[j]])
+
+                J[i, j] = loss_function(theta, X, y)
+
+        T0, T1 = np.meshgrid(theta0_vals, theta1_vals)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        ax.plot_surface(T0, T1, J.T)
+
+        ax.set_xlabel("theta0")
+        ax.set_ylabel("theta1")
+        ax.set_zlabel("Cost")
+
+        plt.show()
+    visualize_cost_surface(x_2d_1,y_2d_1)
+    visualize_cost_surface(x_2d_2d,y_2d_2)
     return
 
 
